@@ -1,1 +1,31 @@
 
+name: Build Camera WiFi Scanner APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Unpack source
+        run: unzip -q CameraWiFiScanner_Source.zip -d source
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build APK
+        working-directory: source
+        run: |
+          gradle wrapper --gradle-version 8.7
+          ./gradlew --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CameraWiFiScanner-APK
+          path: source/app/build/outputs/apk/debug/*.apk
